@@ -181,6 +181,17 @@ button {
   background: #f7f7ff;
 }
 
+.reset-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reset-button:disabled:hover {
+  border-color: var(--line);
+  color: var(--muted);
+  background: #fff;
+}
+
 .reset-button:focus-visible,
 .layer-button:focus-visible,
 .chart-point:focus-visible {
@@ -861,8 +872,7 @@ button {
 }
 
 .mode-card h2,
-.template-section h2,
-.saved-section h2 {
+.template-section h2 {
   margin: 10px 0 8px;
   font-size: 22px;
   letter-spacing: -0.03em;
@@ -912,7 +922,6 @@ button {
 .option-button:focus-visible,
 .template-card:focus-visible,
 .primary-button:focus-visible,
-.delete-button:focus-visible,
 .add-button:focus-visible,
 .remove-button:focus-visible,
 .brand--button:focus-visible,
@@ -978,65 +987,6 @@ button {
   border-top: 1px solid var(--line);
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   font-size: 10px;
-}
-
-.saved-section {
-  margin-top: 20px;
-  padding: 22px;
-}
-
-.saved-list {
-  list-style: none;
-  margin: 14px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-
-.saved-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #f8f9fd;
-}
-
-.saved-row > div:first-child {
-  display: grid;
-  gap: 3px;
-}
-
-.saved-row strong {
-  font-size: 13px;
-}
-
-.saved-row span {
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.saved-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.delete-button {
-  padding: 7px 12px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #fff;
-  color: var(--rose);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.delete-button:hover {
-  border-color: var(--rose);
-  background: #fff5f7;
 }
 
 /* Wizard */
@@ -1380,10 +1330,5 @@ button {
 
   .workspace-actions {
     padding-bottom: 0;
-  }
-
-  .saved-row {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }

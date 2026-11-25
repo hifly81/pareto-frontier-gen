@@ -6,8 +6,6 @@ import { EMPTY_PROJECT } from './domain/pareto';
 import type { ParetoProject } from './domain/pareto';
 import { TEMPLATES } from './domain/templates';
 import type { Template } from './domain/templates';
-import { deleteSavedProject, readSavedProjects, saveProject, STORAGE_KEY } from './storage';
-import type { SavedProject } from './storage';
 
 type View = 'home' | 'wizard' | 'workspace';
 
@@ -16,10 +14,9 @@ const snapshot = (project: ParetoProject) => JSON.stringify(project);
 export default function App() {
   const [view, setView] = useState<View>('home');
   const [project, setProject] = useState<ParetoProject>(EMPTY_PROJECT);
-  const [saved, setSaved] = useState<SavedProject[]>(readSavedProjects);
-  const [lastSaved, setLastSaved] = useState(() => snapshot(EMPTY_PROJECT));
+  const [openedSnapshot, setOpenedSnapshot] = useState(() => snapshot(EMPTY_PROJECT));
 
-  const dirty = view === 'workspace' && snapshot(project) !== lastSaved;
+  const dirty = view === 'workspace' && snapshot(project) !== openedSnapshot;
 
   useEffect(() => {
     if (!dirty) return;
@@ -31,14 +28,6 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
 
-  useEffect(() => {
-    function sync(event: StorageEvent) {
-      if (event.key === STORAGE_KEY || event.key === null) setSaved(readSavedProjects());
-    }
-    window.addEventListener('storage', sync);
-    return () => window.removeEventListener('storage', sync);
-  }, []);
-
   function goHome() {
     if (dirty && !window.confirm('Discard unsaved changes and return home?')) return;
     setView('home');
@@ -46,19 +35,19 @@ export default function App() {
 
   function startFree() {
     setProject(EMPTY_PROJECT);
-    setLastSaved(snapshot(EMPTY_PROJECT));
+    setOpenedSnapshot(snapshot(EMPTY_PROJECT));
     setView('workspace');
   }
 
   function startWizard() {
     setProject(EMPTY_PROJECT);
-    setLastSaved(snapshot(EMPTY_PROJECT));
+    setOpenedSnapshot(snapshot(EMPTY_PROJECT));
     setView('wizard');
   }
 
   function loadProject(next: ParetoProject) {
     setProject(next);
-    setLastSaved(snapshot(next));
+    setOpenedSnapshot(snapshot(next));
     setView('workspace');
   }
 
@@ -66,28 +55,14 @@ export default function App() {
     loadProject(template.project);
   }
 
-  function openSaved(entry: SavedProject) {
-    loadProject(entry.project);
-  }
-
-  function handleSave(): string {
-    const outcome = saveProject(project);
-    setSaved(outcome.entries);
-    if (outcome.status !== 'error') setLastSaved(snapshot(project));
-    return outcome.message;
-  }
-
   return (
     <>
       {view === 'home' && (
         <HomeView
           templates={TEMPLATES}
-          saved={saved}
           onWizard={startWizard}
           onFree={startFree}
           onTemplate={loadTemplate}
-          onSaved={openSaved}
-          onDeleteSaved={(id) => setSaved(deleteSavedProject(id))}
         />
       )}
 
@@ -100,12 +75,7 @@ export default function App() {
       )}
 
       {view === 'workspace' && (
-        <Workspace
-          project={project}
-          onChange={setProject}
-          onHome={goHome}
-          onSave={handleSave}
-        />
+        <Workspace project={project} onChange={setProject} onHome={goHome} />
       )}
     </>
   );

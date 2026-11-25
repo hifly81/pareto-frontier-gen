@@ -1,4 +1,4 @@
-/** Generates stable-enough unique ids for points and saved projects. */
+/** Generates stable-enough unique ids for candidate and reference points. */
 export function newId(prefix: string): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return `${prefix}-${crypto.randomUUID()}`;

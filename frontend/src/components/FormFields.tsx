@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type {
   AxisConfig,
   ObjectiveDirection,
@@ -48,25 +48,41 @@ interface NumberFieldProps {
 
 export function NumberField({ label, value, onCommit, bounds }: NumberFieldProps) {
   const [draft, setDraft] = useState(String(value));
+  const editing = useRef(false);
+  const lastCommitted = useRef(value);
+  const rangeHint =
+    bounds && bounds.max > bounds.min ? `Allowed range: ${bounds.min} to ${bounds.max}` : undefined;
 
-  useEffect(() => setDraft(String(value)), [value]);
+  useEffect(() => {
+    if (editing.current || value === lastCommitted.current) return;
+    lastCommitted.current = value;
+    setDraft(String(value));
+  }, [value]);
 
   return (
     <label className="field">
       <span>{label}</span>
       <input
-        type="number"
-        step="any"
-        min={bounds && bounds.max > bounds.min ? bounds.min : undefined}
-        max={bounds && bounds.max > bounds.min ? bounds.max : undefined}
+        type="text"
+        inputMode="decimal"
+        title={rangeHint}
         value={draft}
+        onFocus={() => {
+          editing.current = true;
+        }}
         onChange={(event) => {
           const text = event.target.value;
           setDraft(text);
           const parsed = Number(text);
-          if (text.trim() !== '' && Number.isFinite(parsed)) onCommit(parsed);
+          if (text.trim() !== '' && Number.isFinite(parsed)) {
+            lastCommitted.current = parsed;
+            onCommit(parsed);
+          }
         }}
-        onBlur={() => setDraft(String(value))}
+        onBlur={() => {
+          editing.current = false;
+          setDraft(String(value));
+        }}
       />
     </label>
   );
@@ -86,8 +102,27 @@ interface AxisFieldsProps {
 
 export function AxisFields({ axisName, axis, onPatch }: AxisFieldsProps) {
   const [ticksDraft, setTicksDraft] = useState(axis.ticks.join(', '));
+  // Only adopt canonical ticks from outside: the raw draft must survive intermediate typing.
+  const lastEmittedTicks = useRef(axis.ticks.join(', '));
 
-  useEffect(() => setTicksDraft(axis.ticks.join(', ')), [axis.ticks]);
+  useEffect(() => {
+    const current = axis.ticks.join(', ');
+    if (current === lastEmittedTicks.current) return;
+    lastEmittedTicks.current = current;
+    setTicksDraft(current);
+  }, [axis.ticks]);
+
+  function handleTicksChange(text: string) {
+    const ticks = text
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => part !== '')
+      .map(Number)
+      .filter(Number.isFinite);
+    setTicksDraft(text);
+    lastEmittedTicks.current = ticks.join(', ');
+    onPatch({ ticks });
+  }
 
   return (
     <fieldset className="config-group">
@@ -129,17 +164,7 @@ export function AxisFields({ axisName, axis, onPatch }: AxisFieldsProps) {
           type="text"
           value={ticksDraft}
           placeholder="0, 20, 40, 60, 80, 100"
-          onChange={(event) => {
-            const text = event.target.value;
-            setTicksDraft(text);
-            const ticks = text
-              .split(',')
-              .map((part) => part.trim())
-              .filter((part) => part !== '')
-              .map(Number)
-              .filter(Number.isFinite);
-            onPatch({ ticks });
-          }}
+          onChange={(event) => handleTicksChange(event.target.value)}
         />
       </label>
       <label className="field field--wide">

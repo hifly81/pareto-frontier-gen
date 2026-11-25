@@ -21,7 +21,8 @@ import type {
   Probe,
 } from '../domain/pareto';
 import { COLORS, KIND_COLOR } from '../theme';
-import { exportProject, importProject } from '../storage';
+import { exportChartPng, exportChartSvg } from '../chartExport';
+import { exportProject, importProject } from '../projectFile';
 import { ChartConfigPanel } from './ChartConfigPanel';
 import { ParetoChart } from './ParetoChart';
 import type { ChartView } from './ParetoChart3D';
@@ -310,16 +311,16 @@ interface WorkspaceProps {
   project: ParetoProject;
   onChange: (project: ParetoProject) => void;
   onHome: () => void;
-  onSave: () => string;
 }
 
-export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps) {
+export function Workspace({ project, onChange, onHome }: WorkspaceProps) {
   const [layers, setLayers] = useState<Layers>(DEFAULT_LAYERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [probe, setProbe] = useState<Probe | null>(null);
   const [view, setView] = useState<ChartView>(DEFAULT_CHART_VIEW);
   const [notice, setNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const chartRef = useRef<HTMLElement>(null);
 
   const analysis = useMemo(() => evaluateProject(project), [project]);
   const candidate = analysis.solutions.find((solution) => solution.id === selectedId) ?? null;
@@ -380,14 +381,42 @@ export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps)
     setNotice(null);
   }
 
-  function handleSave() {
-    setNotice(onSave());
-  }
-
   function handleExport() {
     try {
       exportProject(project);
       setNotice('Project exported as JSON.');
+    } catch (error) {
+      setNotice(errorMessage(error));
+    }
+  }
+
+  function currentChart(): SVGSVGElement | null {
+    return chartRef.current?.querySelector<SVGSVGElement>('svg.pareto-chart') ?? null;
+  }
+
+  function handleExportSvg() {
+    const svg = currentChart();
+    if (!svg) {
+      setNotice('Fix the axis settings before exporting the chart.');
+      return;
+    }
+    try {
+      exportChartSvg(svg, project);
+      setNotice('Chart exported as SVG.');
+    } catch (error) {
+      setNotice(errorMessage(error));
+    }
+  }
+
+  async function handleExportPng() {
+    const svg = currentChart();
+    if (!svg) {
+      setNotice('Fix the axis settings before exporting the chart.');
+      return;
+    }
+    try {
+      await exportChartPng(svg, project);
+      setNotice('Chart exported as PNG.');
     } catch (error) {
       setNotice(errorMessage(error));
     }
@@ -401,7 +430,7 @@ export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps)
       onChange(imported);
       setSelectedId(null);
       setProbe(null);
-      setNotice('Project imported. Review it, then save it if you want to keep it.');
+      setNotice('Project imported. Export it as JSON if you want to keep it.');
     } catch (error) {
       setNotice(errorMessage(error));
     } finally {
@@ -429,9 +458,6 @@ export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps)
           <button type="button" className="reset-button" onClick={resetView}>
             Reset view
           </button>
-          <button type="button" className="reset-button" onClick={handleExport}>
-            Export JSON
-          </button>
           <button type="button" className="reset-button" onClick={() => fileRef.current?.click()}>
             Import JSON
           </button>
@@ -443,14 +469,35 @@ export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps)
             tabIndex={-1}
             onChange={handleImport}
           />
-          <button type="button" className="primary-button" onClick={handleSave}>
-            Save to browser
+          <button
+            type="button"
+            className="reset-button"
+            onClick={handleExportSvg}
+            disabled={axesInvalid}
+          >
+            Export SVG
+          </button>
+          <button
+            type="button"
+            className="reset-button"
+            onClick={handleExportPng}
+            disabled={axesInvalid}
+          >
+            Export PNG
+          </button>
+          <button type="button" className="primary-button" onClick={handleExport}>
+            Export JSON
           </button>
         </div>
       </div>
 
       {notice && (
-        <div className={`notice ${notice.startsWith('Saved') ? 'notice--success' : ''}`} role="status">
+        <div
+          className={`notice ${
+            notice.startsWith('Project') || notice.startsWith('Chart') ? 'notice--success' : ''
+          }`}
+          role="status"
+        >
           {notice}
         </div>
       )}
@@ -459,7 +506,7 @@ export function Workspace({ project, onChange, onHome, onSave }: WorkspaceProps)
       </div>
 
       <main className="layout">
-        <section className="card chart-card" aria-label="Interactive chart">
+        <section className="card chart-card" aria-label="Interactive chart" ref={chartRef}>
           <div className="card-header">
             <div>
               <h2>Trade-off between objectives</h2>

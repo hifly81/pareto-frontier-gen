@@ -43,19 +43,26 @@ The build is completely static: `frontend/dist` can be served by any web server,
 subpath, because `vite.config.ts` sets `base: './'`. The entire UI is in English
 (`<html lang="en">`). Chart data is edited in the `Chart data` panel and lives in `App` state.
 
-`Save to browser` persists projects in `localStorage` (key
-`pareto-frontier-generator.projects.v1`, at most 12 projects). `Export JSON` and `Import JSON`
-exchange portable files. Saved and imported JSON is validated by `normalizeProject` before it
-reaches the UI. No network requests are made.
+There is no local or remote persistence. `Export JSON` and `Import JSON` exchange portable files;
+imported JSON is validated by `normalizeProject` before it reaches the UI. No network requests are
+made.
+
+Chart downloads are generated fully in the browser: the live SVG is cloned, computed styles are
+inlined, a white background is added and the markup is serialized as a standalone file. PNG export
+rasterizes that same markup on a canvas at 2x, so it preserves the current 3D rotation.
+
+Numeric editors are text inputs with `inputMode="decimal"` and a local draft: intermediate text such
+as `1.` or a trailing comma in a tick list stays intact while typing, the parsed value is committed
+immediately, and clamped values are shown on blur.
 
 ## 3. Bundle structure
 
 - `index.html` → `#root`, metadata, inline SVG favicon
 - `src/main.tsx` → `createRoot`, `StrictMode`, `styles.css` import
-- `src/App.tsx` → views, unsaved-work guard, saved-project sync across tabs
-- `src/components/HomeView.tsx` → creation, templates and saved projects
+- `src/App.tsx` → views and unsaved-work guard
+- `src/components/HomeView.tsx` → creation and templates
 - `src/components/Wizard.tsx` → three-step guided creation
-- `src/components/Workspace.tsx` → chart, details, layers, import/export and save feedback
+- `src/components/Workspace.tsx` → chart, details, layers, import/export feedback
 - `src/components/ParetoChart.tsx` → 2D SVG chart and renderer selection
 - `src/components/ParetoChart3D.tsx` → isometric 3D chart, pointer and keyboard probing
 - `src/components/ChartConfigPanel.tsx`, `src/components/FormFields.tsx` → axis and point editors
@@ -63,7 +70,8 @@ reaches the UI. No network requests are made.
 - `src/domain/pareto.ts` → directions, dominance, frontier, classification, validation, normalization
 - `src/domain/pareto.test.ts` → automated tests for the domain
 - `src/domain/templates.ts` → six example datasets: four 2D and two 3D, including LLM cost vs. accuracy
-- `src/storage.ts` → versioned local persistence and JSON import/export
+- `src/projectFile.ts` → validated JSON import/export and project-based download filenames
+- `src/chartExport.ts` → standalone SVG serialization, computed-style inlining and PNG rasterization
 - `src/id.ts` → id generation
 - `src/theme.ts` → shared palette
 

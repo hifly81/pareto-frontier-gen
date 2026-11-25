@@ -5,7 +5,7 @@ their configuration files.
 
 For now the frontend is completely static. The dominance algorithm, the computed frontier and the
 example templates live in `../frontend/src/domain/` and are not loaded from any service. Projects
-are saved in the browser with `localStorage`; JSON import/export is available in the workspace.
+are kept as portable JSON files exported from the workspace; there is no local or remote persistence.
 
 ## When this folder is populated
 

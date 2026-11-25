@@ -21,7 +21,7 @@
 | Axis and point editors             | `frontend/src/components/ChartConfigPanel.tsx`, `FormFields.tsx` |
 | Colors, spacing, responsive design | `frontend/src/styles.css` + `doc/BRAND.md`                  |
 | Shared palette                     | `frontend/src/theme.ts` + `doc/BRAND.md`                    |
-| Local persistence and JSON files   | `frontend/src/storage.ts`, `frontend/src/App.tsx`           |
+| JSON files and unsaved-work guard  | `frontend/src/projectFile.ts`, `frontend/src/App.tsx`       |
 | Dependencies or build              | `package.json`, `vite.config.ts`, `doc/TECH_STACK.md`       |
 | Server-side code                   | `backend/` (not present yet)                                |
 
@@ -44,7 +44,8 @@ Manual checks in the browser:
 - switching between 2 and 3 objectives in `Chart data` preserves coordinates and redraws the chart;
 - changing an axis direction recomputes the frontier and point statuses immediately;
 - the wizard completes in three steps with one candidate and opens the computed chart;
-- saving reports success, reopening from home works, and JSON export/import round-trips a project;
+- SVG and PNG export download the current chart without external assets; PNG is 1360 × 1320;
+- JSON export/import round-trips a project;
 - a malformed or oversized JSON file is rejected with a readable message;
 - editing a coordinate updates statuses, annotations and the frontier immediately;
 - hover, click, layer toggles, keyboard probing, 3D rotation and `Reset view` work;

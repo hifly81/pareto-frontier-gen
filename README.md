@@ -104,9 +104,6 @@ On load you get two options:
   - **Cloud instance selection** (3D) — monthly cost ↓, latency ↓ and throughput ↑;
   - **Sustainable product design** (3D) — unit cost ↓, carbon footprint ↓ and durability ↑.
 
-Projects saved with **Save to browser** also appear on the home screen and can be reopened or
-deleted. Saving uses `localStorage`; no network requests are made.
-
 ## Working in the workspace
 
 - Use the **Objectives** buttons in the **Chart data** panel to switch between 2 and 3 objectives.
@@ -122,10 +119,10 @@ deleted. Saving uses `localStorage`; no network requests are made.
 - In 3D, drag the chart to orbit it around the objectives, or focus the chart and press
   `Shift` + arrow keys. A visible guide below the chart lists the controls for each axis.
 - Toggle the grid, regions, frontier, points and annotations with the layer buttons.
-- **Export JSON** downloads the current project; **Import JSON** loads one back. Imported and saved
-  files are validated and sanitized before use.
-- **Save to browser** stores up to 12 projects locally. Saving reports success, an unchanged state
-  or an error, and the app warns before leaving with unsaved edits.
+- **Export SVG** and **Export PNG** download the current chart at its native size (PNG at 2x),
+  including the current 3D camera angle. **Export JSON** downloads the whole project;
+  **Import JSON** loads one back. Imported files are validated and sanitized before use. The app
+  warns before leaving with unsaved edits.
 - **Reset view** restores layers, the default 3D angle and clears the selection without touching
   your data.
 
@@ -142,7 +139,8 @@ The frontend interface and the documentation in `doc/` are entirely in English.
 │   └── src/
 │       ├── domain/        # pure Pareto analysis, tests and templates
 │       ├── components/    # home, wizard, workspace, 2D/3D charts and editors
-│       ├── storage.ts     # browser-local saved projects and JSON import/export
+│       ├── projectFile.ts # JSON import/export with validation
+│       ├── chartExport.ts # standalone SVG and PNG chart downloads
 │       └── theme.ts       # shared palette
 ├── backend/               # reserved for future server code (store, db, API)
 └── doc/                   # project documentation

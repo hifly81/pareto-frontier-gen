@@ -204,7 +204,7 @@ function finiteOrPoint(value: number | undefined, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-/** Sanitizes untrusted input (saved or imported JSON) into a usable project. */
+/** Sanitizes untrusted input (imported JSON) into a usable project. */
 export function normalizeProject(value: unknown): ParetoProject | null {
   if (typeof value !== 'object' || value === null) return null;
   const raw = value as Record<string, unknown>;

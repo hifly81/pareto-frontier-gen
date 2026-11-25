@@ -100,7 +100,7 @@ Edge cases and robustness:
   identical solutions are all non-dominated but produce a single path vertex per X value;
 - non-finite or out-of-range coordinates are ignored by the analysis so the path cannot fold back
   outside the plot; validation warns the user in the data editor;
-- titles, labels and directions are validated; saved/imported JSON is normalized before use:
+- titles, labels and directions are validated; imported JSON is normalized before use:
   invalid axes are rejected, invalid ticks are dropped, coordinates are clamped and duplicate ids
   receive unique suffixes.
 
@@ -122,7 +122,7 @@ On startup the home page shows **two main options**:
    - *Cloud instance selection* (3D) — cost ↓, latency ↓, throughput ↑;
    - *Sustainable product design* (3D) — unit cost ↓, carbon footprint ↓, durability ↑.
 
-The home page also lists projects saved in the browser, which can be reopened or deleted.
+The home page offers the creation modes and the six templates; no projects are stored in the browser.
 
 ## 4. Features
 
@@ -153,9 +153,11 @@ The home page also lists projects saved in the browser, which can be reopened or
   reference points (including Z): the frontier and all classifications are recalculated on every
   change. Invalid axis ranges replace the chart with an explicit error state instead of a broken
   drawing.
-- `Save to browser` stores the project in `localStorage` (at most 12 entries) and reports the
-  outcome. An unsaved-work guard warns before leaving the page or returning home.
-- `Export JSON` and `Import JSON` provide portable, validated project files.
+- `Export SVG` and `Export PNG` download the current 2D or 3D chart; computed styles are inlined, a
+  white background is added and PNG is rendered at 2x. The 3D export uses the current camera angle.
+- `Export JSON` and `Import JSON` provide portable, validated project files. There is no `Save to
+  browser` feature and no `localStorage` usage: the exported file is the only way to keep a project.
+- An unsaved-work guard warns before leaving the page or returning home after edits.
 - `Home` button returns to the start screen after confirming when edits are unsaved.
 
 ### 4.3 Accessibility
@@ -163,8 +165,8 @@ The home page also lists projects saved in the browser, which can be reopened or
 - Every point is reachable with the keyboard (`Tab`) and activatable with `Enter` or `Space`.
 - The chart is a focusable `group` with a descriptive label; arrow keys probe the plot and, in 3D,
   page keys probe the Z axis.
-- Point status changes are announced in a polite live region; save/import/export results use a
-  status region.
+- Point status changes are announced in a polite live region; import/export results use a status
+  region.
 - Layer buttons use `aria-pressed`; decorative SVG content is `aria-hidden`.
 
 ## 5. Non-functional requirements
@@ -173,7 +175,7 @@ The home page also lists projects saved in the browser, which can be reopened or
 - Dependencies are limited to React, React DOM, TypeScript, Vite, Vitest (tests) and their
   toolchain packages.
 - Responsive layout: the chart and panels stack below 1000px and use a single column below 640px.
-- Untrusted saved/imported data is sanitized before rendering; no network requests are made.
+- Untrusted imported data is sanitized before rendering; no network requests are made.
 - Automated tests, typecheck and build must pass without errors.
 - The entire frontend UI and all documentation are in English.
 
@@ -195,8 +197,8 @@ The home page also lists projects saved in the browser, which can be reopened or
    three statuses from full-point dominance.
 6. Switching from 2 to 3 objectives keeps all coordinates, adds a usable Z axis and replaces the
    flat chart with the 3D chart; switching back removes Z and restores the polyline.
-7. Templates are editable; local saving makes them reopenable from the home page; JSON
-   export/import round-trips a valid project and rejects malformed files.
-8. Invalid saved/imported data is normalized or rejected without crashing the app.
+7. Templates are editable; JSON export/import round-trips a valid project and rejects malformed
+   files.
+8. Invalid imported data is normalized or rejected without crashing the app.
 9. The entire frontend UI is in English.
 10. `npm test`, `npm run typecheck` and `npm run build` complete successfully.

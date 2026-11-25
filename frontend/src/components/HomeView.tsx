@@ -1,27 +1,15 @@
 import { evaluateProject } from '../domain/pareto';
 import type { Template } from '../domain/templates';
-import type { SavedProject } from '../storage';
 import { SiteHeader } from './SiteHeader';
 
 interface HomeViewProps {
   templates: readonly Template[];
-  saved: SavedProject[];
   onWizard: () => void;
   onFree: () => void;
   onTemplate: (template: Template) => void;
-  onSaved: (entry: SavedProject) => void;
-  onDeleteSaved: (id: string) => void;
 }
 
-export function HomeView({
-  templates,
-  saved,
-  onWizard,
-  onFree,
-  onTemplate,
-  onSaved,
-  onDeleteSaved,
-}: HomeViewProps) {
+export function HomeView({ templates, onWizard, onFree, onTemplate }: HomeViewProps) {
   return (
     <div className="app-shell">
       <SiteHeader />
@@ -83,43 +71,6 @@ export function HomeView({
           </div>
         </section>
       </main>
-
-      {saved.length > 0 && (
-        <section className="card saved-section" aria-labelledby="saved-heading">
-          <div className="card-header">
-            <div>
-              <h2 id="saved-heading">Saved in this browser</h2>
-              <p>Reopen a project you saved earlier.</p>
-            </div>
-          </div>
-          <ul className="saved-list">
-            {saved.map((entry) => (
-              <li className="saved-row" key={entry.id}>
-                <div>
-                  <strong>{entry.project.title || 'Untitled frontier'}</strong>
-                  <span>
-                    {entry.project.candidates.length} solutions · saved{' '}
-                    {new Date(entry.savedAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="saved-actions">
-                  <button type="button" className="reset-button" onClick={() => onSaved(entry)}>
-                    Open
-                  </button>
-                  <button
-                    type="button"
-                    className="delete-button"
-                    aria-label={`Delete ${entry.project.title}`}
-                    onClick={() => onDeleteSaved(entry.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <footer className="site-footer">
         <span>Pareto Generator</span>

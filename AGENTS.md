@@ -22,8 +22,9 @@ or with `Shift` + arrow keys.
 ## Important rules
 
 1. **Do not write backend code inside `frontend/`.** The frontend is isolated: it reads data from
-   the domain, saves projects in browser `localStorage` and supports JSON import/export. There are
-   no network calls. `backend/` is intentionally empty and will be populated later.
+   the domain and supports JSON import/export plus SVG/PNG chart downloads. There is no local or
+   remote persistence and no network calls. `backend/` is intentionally empty and will be populated
+   later.
 2. **The math lives in `frontend/src/domain/pareto.ts`.** The module is pure (no React, DOM or chart
    library). It supports two or three objectives and every axis can be maximized or minimized:
    dominance uses `objectiveScore` across all active axes. Add the algorithm, the frontier (polyline

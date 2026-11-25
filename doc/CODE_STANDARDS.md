@@ -5,7 +5,7 @@
 - Clarity before abstraction: a small, readable function is better than a generic helper.
 - The domain is pure and framework-independent.
 - No unnecessary dependencies, no `any`, no casts that hide a type error.
-- Untrusted input (saved or imported JSON) is never trusted by shape alone: normalize it at the
+- Untrusted input (imported JSON) is never trusted by shape alone: normalize it at the
   boundary with `normalizeProject`.
 - One file does one thing; if it exceeds ~400 lines, consider splitting it.
 
@@ -66,7 +66,7 @@ frontend/
     ├── styles.css
     ├── theme.ts
     ├── id.ts
-    ├── storage.ts
+    ├── projectFile.ts
     ├── domain/
     │   ├── pareto.ts
     │   ├── pareto.test.ts
