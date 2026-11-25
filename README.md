@@ -4,7 +4,7 @@ An interactive generator of Pareto frontiers for **two or three objectives** wit
 configurable preferences: each objective can be **maximized** (higher is better) or **minimized**
 (lower is better).
 
-Instead of a fixed curve, the frontier is **computed from the candidate solutions you provide**.
+The frontier is **computed from the candidate solutions you provide**.
 The app finds every non-dominated solution, connects them into a frontier and classifies any
 reference point or probed combination against it. Two-objective projects use a flat SVG chart;
 three-objective projects use an interactive 3D chart that can be rotated by dragging.
