@@ -1,0 +1,27 @@
+{
+  "name": "pareto-frontier-gen",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Generator of Pareto frontiers from candidate solutions for two or three objectives",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^5.1.2"
+  }
+}
